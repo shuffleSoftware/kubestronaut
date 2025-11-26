@@ -2,6 +2,8 @@
 
 Find a branch for each certificaton
 
+> **_NOTE:_**  All below branches are orphan branches.
+
 - [CKA][cka-branch]
 - [CKAD][ckad-branch]
 - [CKS][cks-branch]
