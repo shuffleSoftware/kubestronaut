@@ -1,0 +1,126 @@
+[x] Playground
+[x] Playground Cilium 
+[x] APIServer crash
+    - /var/log/pods
+    - /var/log/syslog
+    - journalctl -u unut
+    - journalctl | grep unit
+[x] API Server missconfigured
+[x] API Server NodeRestriction
+    - [x] What the NodeRestriction does? 
+        - node-restriction.kubernetes.io label is reserved for administrators to 
+          label their Node objects for workload isolation purposes, and kubelets 
+          will not be allowed to modify labels with that prefix.
+        - https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#noderestriction
+[x] AppArmor
+    - apparmor_parser /root/profile
+    - aa-status | grep nginx
+    - apparmor_status
+    - k explain deploy.spec.template.spec.securityContext.appArmorProfile   
+[x] Auditing Enable Audit Logging
+    - Important to set the flag names correctly
+[x] CertificateSigningRequest sign manually
+    - SOLUTION 1
+        - openssl genrsa -out 60099.key 2048
+        - openssl req -new -key 60099.key -out 60099.csr  
+    - SOLUTION 2
+        - k config set-credentials 60099@internal.users --client-key=60099.key --client-certificate=60099.crt
+        - k config set-context 60099@internal.users --cluster=kubernetes --user=60099@internal.users
+        - k config get-contexts
+        - k config use-context 60099@internal.users  
+        - k get ns
+[x] CertificateSigningRequests sign via API
+    - k get csr - get jsonoath for status.CRT
+    - k config set-credential 60099@internal.users --client-key=60099.key --client-certificate=60099.crt
+    - k config set-context 60099@internal.users --cluster=kubernetes --user=60099@internal.users
+    - k config use-context 60099@internal.users
+    - k get ns # won' work but the right error appears
+[x] CIS Benchmarks fix Controlplane
+    - straightforward using kube-bench run --targets master --check x.x.x
+[x] Container Hardening
+    - Dockerfile best practices
+[x] Container Image Footprint User
+    - docker build -t name -f /path/to/Dockerfile /path/to/context
+    - RUN adduser -D -g '' appuser
+    - USER adduser
+[x] Container Namespaces Podman
+    - Same as Docker but using 'podman' base cli 
+[x] Container Namespaces Docker
+    - docker run -d --name app1 nginx:alpine sleep infinity
+    - docker run -d --name app2 --pid=container:app1 nginx:alpine sleep infinity
+[x] Falco Change Rule
+    - find falco, use falco_rules.yaml as reference
+[x] ImagePolicyWebhook Setup
+    - policyWebhook.json has a name, include it in --enable-admission-plugins
+[x] Image Use Digest
+    - Easy one, pod holds the actual digest, not the deploy
+[x] Image Vulnerability Scanning Trivy
+    - handy: k get ... -o jsonpath='{range .items[*]}...{end}'
+[x] Immutability Readonly Filesystem
+    - important to check mounted paths
+[x] Ingress Create
+    - easy one, keep in mind Prefix type
+[x] Ingress Secure
+    - openssl req -x509 -nodes -days 365 \
+      -newkey rsa:2048 -keyout cert.key \
+      -out cert.crt -subj "/CN=my.domain.com/O=my.domain.com"
+[x] NetworkPolicy Create Default Deny
+    - Make sure only needed 'policyTypes' are explicitely set
+[x] NetworkPolicy Metadata Protection
+    - Documentation k explain netpol.spec.egress.to.ipBlock should be <[]IPBlock> not <IPBlock>
+    - submitted https://github.com/kubernetes/website/issues/53369#issuecomment-3564976108
+[x] NetworkPolicy Namespace Selector
+    - Easy, rememer again to specify **policyTypes**  
+[x] Privilege Escalation Containers
+    - k explain useful
+[x] Privileged Containers
+    - k explain sts.spec.template.spec.containers.securityContext.privileged
+[x] RBAC ServiceAccount Permissions
+    - k explain
+    - k create clusterrolebinding/clusterrole/role/rolebinding --help > to.yaml
+[x] RBAC User Permissions
+    - Careful with apiGroup
+    - clusterole + rolebinding
+    - role + rolebinding
+[x] Sandbox gVisor
+    - can be easy if gVisor is already installed
+    - runtimeClass for gVisor is runsc
+[x] Secret ETCD Encryption
+    - Get ready for EncryptionConfiguratio kind
+    - Mount it on kubeapiserver and use flag for kube-apiserver 
+[x] Secret Access in PODS   
+    - Quiet easy, remember to test and pay attention to secret as volume
+      especially when it mounts as a file path, i.e. /etc/hosts will be volumeMounts[n].mountPath: /etc/
+[x] Secret Read and Decode
+    - Very handy to work with --field-selector + -o jsonpath + jq for several items 
+[x] Secret ServiceAccount Pod
+    - k explain very handy
+    - k run my-pod --dry-run=client -o yaml > pod.yaml  
+[x] ServiceAccount Token Mounting
+    - quiet easy, k explain
+[x] Static Manual Analysis Docker
+    - Mostly checking Dockerfiles
+    - User creation
+    - ENV exposure
+[x] Static Manual Analysis K8s
+    - securityContext 
+    - dropCapabilities 
+    - privileged
+[x] Syscall Activity Strace
+    - strace <command>
+    - strace -p PID -f[ollow] -cw 
+[x] System Hardening Close Open Ports
+    - Handy to get strace details of a running app
+    - use lsof -iTCP:1234
+[x] System Hardening Manage Packages
+    - apt show package - apt remove package
+    - systemctl status/stop service
+[x] Verify Platform Binaries 
+    - sha256sum
+    - systemctl status kubelet > check kubelet.service > find bin
+        - /usr/bin/kubelet version
+        - sha256sum it's bin
+        - sha256sum downloaded bin
+        - /usr/bin/kubelet version
+
+
